@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DB: 'interest_poll'
+      PGDATA: /tmp
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    ports:
+      - 5545:5432
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8090:8080

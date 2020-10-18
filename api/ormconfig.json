@@ -1,0 +1,11 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5545,
+  "username": "postgres",
+  "password": "postgres",
+  "database": "interest_poll",
+  "entities": ["src/entities/*.ts"],
+  "synchronize": true,
+  "logging": true
+}
