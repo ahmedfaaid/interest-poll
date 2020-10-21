@@ -4,10 +4,13 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import * as path from 'path';
+import cors from 'cors';
 import { PollResolver } from './resolvers/Poll';
 
 const main = async () => {
   const app = express();
+
+  app.use(cors());
 
   await createConnection().then(() =>
     console.log('Connection to database established')
