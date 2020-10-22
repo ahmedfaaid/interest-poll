@@ -1,4 +1,4 @@
-import { Mutation, Query, Resolver, Arg } from 'type-graphql';
+import { Mutation, Query, Resolver, Arg, Int } from 'type-graphql';
 import { getConnection, Repository } from 'typeorm';
 import {
   iPhonePoll,
@@ -9,10 +9,19 @@ import {
 @Resolver(iPhonePoll)
 export class PollResolver {
   @Query(() => [iPhonePoll])
-  async iphonePolls(): Promise<iPhonePoll[]> {
+  async iphonePolls(
+    @Arg('limit', () => Int) limit: number,
+    @Arg('skip', () => Int, { nullable: true }) skip: number
+  ): Promise<iPhonePoll[]> {
     const pollRepo = getConnection().getRepository(iPhonePoll);
 
-    return await pollRepo.find();
+    const take = limit;
+
+    return await pollRepo.find({
+      order: { createdAt: 'DESC' },
+      take,
+      skip
+    });
   }
 
   @Query(() => [iPhonePoll])
