@@ -12,9 +12,9 @@ const main = async () => {
 
   app.use(cors());
 
-  await createConnection().then(() =>
-    console.log('Connection to database established')
-  );
+  const conn = await createConnection();
+
+  // await conn.runMigrations();
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({

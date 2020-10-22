@@ -6,6 +6,10 @@
   "password": "postgres",
   "database": "interest_poll",
   "entities": ["src/entities/*.ts"],
+  "migrations": ["src/migrations/*.ts"],
+  "cli": {
+    "migrationsDir": "src/migrations"
+  },
   "synchronize": true,
   "logging": true
 }
