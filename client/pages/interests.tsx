@@ -1,21 +1,21 @@
 import {
-  Box,
   Button,
-  Divider,
-  Flex,
-  Heading,
-  Icon,
+  FormControl,
+  FormLabel,
   IconButton,
   List,
-  ListItem,
+  Select,
   Spinner,
-  Stack,
-  Text
+  Stack
 } from '@chakra-ui/core';
 import { withUrqlClient } from 'next-urql';
-import Link from 'next/link';
 import { useState } from 'react';
 import { useQuery } from 'urql';
+import DatePicker from 'react-datepicker';
+import Categories from '../components/Categories';
+import DataItem from '../components/DataItem';
+import Layout from '../components/Layout';
+import SwitchPage from '../components/SwitchPage';
 
 const InterestPolls = `
   query($limit: Int!, $skip: Int) {
@@ -32,6 +32,7 @@ const InterestPolls = `
 
 function Interests() {
   const [variables, setVariables] = useState({ limit: 15, skip: 0 });
+  const [startDate, setStartDate] = useState(new Date());
   const [result, reexecuteQuery] = useQuery({
     query: InterestPolls,
     variables
@@ -49,73 +50,57 @@ function Interests() {
   };
 
   if (fetching) {
-    return <Spinner color='pink.500' />;
+    return (
+      <Layout>
+        <Spinner color='pink.500' />
+      </Layout>
+    );
   }
 
   return (
-    <div>
-      <Box bg='pink.500' p={4} textAlign='center'>
-        <Heading size='lg' color='white' as='h1'>
-          TMO iPhone 12 Interest Poll
-        </Heading>
-      </Box>
-      <Box textAlign='center' color='pink.500' mt={4}>
-        <Text>
-          <Icon name='arrow-back' mr={1} />
-          <Link href='/'>
-            <a>Back to home</a>
-          </Link>
-        </Text>
-      </Box>
-      <Stack justify='center' align='center' mt={8} spacing={4}>
-        <IconButton icon='repeat' size='lg' onClick={refetch} />
-        <Flex borderBottom='1px' borderBottomColor='gray.100'>
-          <Box w={40} textAlign='center' fontWeight='bold'>
-            BAN
-          </Box>
-          <Divider orientation='vertical' />
-          <Box w={40} textAlign='center' fontWeight='bold'>
-            MODEL
-          </Box>
-          <Divider orientation='vertical' />
-          <Box w={40} textAlign='center' fontWeight='bold'>
-            QUANTITY
-          </Box>
-          <Divider orientation='vertical' />
-          <Box w={40} textAlign='center' fontWeight='bold'>
-            STARTED PROCESS
-          </Box>
-          <Divider orientation='vertical' />
-          <Box w={40} textAlign='center' fontWeight='bold'>
-            DATE
-          </Box>
-        </Flex>
-        <List as='ol' spacing={4}>
+    <Layout>
+      <SwitchPage text='Back to Home' page='/' direction='left' />
+      <form>
+        <FormControl>
+          <FormLabel htmlFor='model'>Model</FormLabel>
+          <Select name='model'>
+            <option value='iPhone 12'>iPhone 12</option>
+            <option value='iPhone 12 Mini'>iPhone 12 Mini</option>
+            <option value='iPhone 12 Pro'>iPhone 12 Pro</option>
+            <option value='iPhone 12 Pro Max'>iPhone 12 Pro Max</option>
+          </Select>
+        </FormControl>
+        <FormControl>
+          <FormLabel htmlFor='startedProcess'>Started Process</FormLabel>
+          <Select name='startedProcess'>
+            <option value='true'>Yes</option>
+            <option value='false'>No</option>
+          </Select>
+        </FormControl>
+        <DatePicker
+          selected={startDate}
+          onChange={date => setStartDate(date)}
+        />
+      </form>
+      <Stack justify='center' align='center' mt={8}>
+        <IconButton
+          icon='repeat'
+          size='lg'
+          aria-label='Refetch Interest Polls'
+          onClick={refetch}
+        />
+        <Categories />
+        <List as='ol'>
           {data.iphonePolls.map(
             ({ id, BAN, model, quantity, startedProcess, createdAt }) => (
-              <ListItem key={id}>
-                <Flex borderBottom='1px' borderBottomColor='gray.100'>
-                  <Box w={40} textAlign='center'>
-                    {BAN}
-                  </Box>
-                  <Divider orientation='vertical' />
-                  <Box w={40} textAlign='center'>
-                    {model}
-                  </Box>
-                  <Divider orientation='vertical' />
-                  <Box w={40} textAlign='center'>
-                    {quantity}
-                  </Box>
-                  <Divider orientation='vertical' />
-                  <Box w={40} textAlign='center'>
-                    {startedProcess === true ? 'Yes' : 'No'}
-                  </Box>
-                  <Divider orientation='vertical' />
-                  <Box w={40} textAlign='center'>
-                    {new Date(createdAt).toDateString()}
-                  </Box>
-                </Flex>
-              </ListItem>
+              <DataItem
+                key={id}
+                BAN={BAN}
+                model={model}
+                quantity={quantity}
+                startedProcess={startedProcess}
+                createdAt={createdAt}
+              />
             )
           )}
         </List>
@@ -128,7 +113,7 @@ function Interests() {
           Load More
         </Button>
       </Stack>
-    </div>
+    </Layout>
   );
 }
 

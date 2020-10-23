@@ -4,19 +4,17 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading,
-  Icon,
   Input,
   Radio,
   RadioGroup,
   Select,
   Stack,
-  Text,
   useToast
 } from '@chakra-ui/core';
 import { useForm } from 'react-hook-form';
 import { useMutation } from 'urql';
-import Link from 'next/link';
+import Layout from '../components/Layout';
+import SwitchPage from '../components/SwitchPage';
 
 type Inputs = {
   BAN: string;
@@ -87,24 +85,16 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <Box bg='pink.500' p={4} textAlign='center'>
-        <Heading size='lg' color='white' as='h1'>
-          TMO iPhone 12 Interest Poll
-        </Heading>
-      </Box>
-      <Box textAlign='center' color='pink.500' mt={4}>
-        <Text>
-          <Link href='/interests'>
-            <a>View All Interests</a>
-          </Link>
-          <Icon name='arrow-forward' ml={1} />
-        </Text>
-      </Box>
+    <Layout>
+      <SwitchPage
+        text='View All Interests'
+        page='/interests'
+        direction='right'
+      />
       <Box d='flex' alignItems='center' justifyContent='center'>
         <form onSubmit={handleSubmit(submitInterest)}>
           <Stack spacing={8} mt={8}>
-            <FormControl isInvalid={errors.BAN}>
+            <FormControl isInvalid={errors.BAN ? true : false}>
               <FormLabel htmlFor='BAN'>BAN</FormLabel>
               <Input
                 name='BAN'
@@ -134,7 +124,7 @@ export default function Home() {
                 </Radio>
               </RadioGroup>
             </FormControl>
-            <FormControl isInvalid={errors.quantity}>
+            <FormControl isInvalid={errors.quantity ? true : false}>
               <FormLabel htmlFor='quantity'>Quantity</FormLabel>
               <Input
                 name='quantity'
@@ -162,6 +152,6 @@ export default function Home() {
           </Stack>
         </form>
       </Box>
-    </div>
+    </Layout>
   );
 }
