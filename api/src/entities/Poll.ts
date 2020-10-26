@@ -59,8 +59,5 @@ export class iPhonePollFilter {
   model: string;
 
   @Field({ nullable: true })
-  quantity: number;
-
-  @Field({ nullable: true })
   startedProcess: boolean;
 }

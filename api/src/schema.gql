@@ -20,7 +20,6 @@ type iPhonePoll {
 
 input iPhonePollFilter {
   model: String
-  quantity: Float
   startedProcess: Boolean
 }
 
@@ -36,6 +35,5 @@ type Mutation {
 }
 
 type Query {
-  filteredPolls(filter: iPhonePollFilter!): [iPhonePoll!]!
-  iphonePolls(limit: Int!, skip: Int): [iPhonePoll!]!
+  iphonePolls(date: DateTime, filter: iPhonePollFilter, limit: Int!, skip: Int): [iPhonePoll!]!
 }

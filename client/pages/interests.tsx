@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Flex,
   FormControl,
   FormLabel,
   IconButton,
@@ -11,15 +13,22 @@ import {
 import { withUrqlClient } from 'next-urql';
 import { useState } from 'react';
 import { useQuery } from 'urql';
-import DatePicker from 'react-datepicker';
+import { useForm } from 'react-hook-form';
 import Categories from '../components/Categories';
 import DataItem from '../components/DataItem';
 import Layout from '../components/Layout';
 import SwitchPage from '../components/SwitchPage';
+import MyDatePicker from '../components/MyDatePicker';
+
+type Inputs = {
+  model: string;
+  startedProcess: boolean;
+  date: Date;
+};
 
 const InterestPolls = `
-  query($limit: Int!, $skip: Int) {
-    iphonePolls(limit: $limit, skip: $skip) {
+  query($limit: Int!, $skip: Int, $filter: iPhonePollFilter, $date: DateTime) {
+    iphonePolls(limit: $limit, skip: $skip, filter: $filter, date: $date) {
       id
       BAN
       model
@@ -31,12 +40,16 @@ const InterestPolls = `
 `;
 
 function Interests() {
-  const [variables, setVariables] = useState({ limit: 15, skip: 0 });
+  const [variables, setVariables] = useState({
+    limit: 15,
+    skip: 0
+  });
   const [startDate, setStartDate] = useState(new Date());
   const [result, reexecuteQuery] = useQuery({
     query: InterestPolls,
     variables
   });
+  const { register, handleSubmit } = useForm<Inputs>();
 
   const { data, fetching, error } = result;
 
@@ -49,6 +62,22 @@ function Interests() {
     setVariables(prev => ({ ...prev, skip: prev.skip + prev.limit }));
   };
 
+  const filterResults = ({ model, startedProcess }) => {
+    let newStartedProcess;
+
+    if (startedProcess === 'true') {
+      newStartedProcess = true;
+    } else if (startedProcess === 'false') {
+      newStartedProcess = false;
+    }
+
+    setVariables(prev => ({
+      ...prev,
+      filter: { model, startedProcess: newStartedProcess },
+      date: startDate
+    }));
+  };
+
   if (fetching) {
     return (
       <Layout>
@@ -57,32 +86,50 @@ function Interests() {
     );
   }
 
+  if (error) {
+    console.log(error);
+    return (
+      <Layout>
+        <div>Error</div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <SwitchPage text='Back to Home' page='/' direction='left' />
-      <form>
-        <FormControl>
-          <FormLabel htmlFor='model'>Model</FormLabel>
-          <Select name='model'>
-            <option value='iPhone 12'>iPhone 12</option>
-            <option value='iPhone 12 Mini'>iPhone 12 Mini</option>
-            <option value='iPhone 12 Pro'>iPhone 12 Pro</option>
-            <option value='iPhone 12 Pro Max'>iPhone 12 Pro Max</option>
-          </Select>
-        </FormControl>
-        <FormControl>
-          <FormLabel htmlFor='startedProcess'>Started Process</FormLabel>
-          <Select name='startedProcess'>
-            <option value='true'>Yes</option>
-            <option value='false'>No</option>
-          </Select>
-        </FormControl>
-        <DatePicker
-          selected={startDate}
-          onChange={date => setStartDate(date)}
-        />
-      </form>
-      <Stack justify='center' align='center' mt={8}>
+      <Box d='flex' alignItems='center' justifyContent='center'>
+        <form onSubmit={handleSubmit(filterResults)}>
+          <Stack spacing={8} mt={8}>
+            <FormControl>
+              <FormLabel htmlFor='model'>Model</FormLabel>
+              <Select name='model' ref={register}>
+                <option value='iPhone 12'>iPhone 12</option>
+                <option value='iPhone 12 Mini'>iPhone 12 Mini</option>
+                <option value='iPhone 12 Pro'>iPhone 12 Pro</option>
+                <option value='iPhone 12 Pro Max'>iPhone 12 Pro Max</option>
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor='startedProcess'>Started Process</FormLabel>
+              <Select name='startedProcess' ref={register}>
+                <option value='true'>Yes</option>
+                <option value='false'>No</option>
+              </Select>
+            </FormControl>
+            <MyDatePicker
+              selectedDate={startDate}
+              handleChange={date => setStartDate(date as any)}
+              isClearable
+              placeholderText='No date selected'
+            />
+            <Button bg='pink.500' color='white' mt={4} type='submit'>
+              Filter
+            </Button>
+          </Stack>
+        </form>
+      </Box>
+      <Stack justify='center' align='center' my={8}>
         <IconButton
           icon='repeat'
           size='lg'
@@ -108,7 +155,7 @@ function Interests() {
           bg='pink.500'
           color='white'
           onClick={loadMore}
-          isDisabled={data.iphonePolls.length < variables.limit}
+          isDisabled={data.iphonePolls.length < variables.limit || fetching}
         >
           Load More
         </Button>
@@ -117,6 +164,6 @@ function Interests() {
   );
 }
 
-export default withUrqlClient(() => ({ url: 'http://localhost:5051/graphql' }))(
-  Interests
-);
+export default withUrqlClient(() => ({
+  url: 'http://localhost:5051/graphql'
+}))(Interests);
