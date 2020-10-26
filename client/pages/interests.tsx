@@ -1,14 +1,17 @@
 import {
   Box,
   Button,
-  Flex,
   FormControl,
   FormLabel,
   IconButton,
   List,
   Select,
   Spinner,
-  Stack
+  Stack,
+  Stat,
+  StatGroup,
+  StatLabel,
+  StatNumber
 } from '@chakra-ui/core';
 import { withUrqlClient } from 'next-urql';
 import { useState } from 'react';
@@ -136,6 +139,20 @@ function Interests() {
           aria-label='Refetch Interest Polls'
           onClick={refetch}
         />
+        <StatGroup d='flex' w='40%' justifyContent='center' my={8}>
+          <Stat bg='pink.500' borderRadius='md' p={4} color='white' mx={4}>
+            <StatLabel>Total Devices</StatLabel>
+            <StatNumber>
+              {data.iphonePolls.reduce((acc, curr) => {
+                return acc + curr.quantity;
+              }, 0)}
+            </StatNumber>
+          </Stat>
+          <Stat bg='pink.500' borderRadius='md' p={4} color='white' mx={4}>
+            <StatLabel>Total Accounts</StatLabel>
+            <StatNumber>{data.iphonePolls.length}</StatNumber>
+          </Stat>
+        </StatGroup>
         <Categories />
         <List as='ol'>
           {data.iphonePolls.map(

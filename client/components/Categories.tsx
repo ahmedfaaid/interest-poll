@@ -2,7 +2,7 @@ import { Box, Divider, Flex } from '@chakra-ui/core';
 
 export default function Categories() {
   return (
-    <Flex borderBottom='1px' borderBottomColor='gray.100' mb={4}>
+    <Flex borderBottom='1px' borderBottomColor='gray.100' my={4}>
       <Box w={40} textAlign='center' fontWeight='bold'>
         BAN
       </Box>
