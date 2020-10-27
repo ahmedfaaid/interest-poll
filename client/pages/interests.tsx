@@ -107,6 +107,7 @@ function Interests() {
             <FormControl>
               <FormLabel htmlFor='model'>Model</FormLabel>
               <Select name='model' ref={register}>
+                <option>All</option>
                 <option value='iPhone 12'>iPhone 12</option>
                 <option value='iPhone 12 Mini'>iPhone 12 Mini</option>
                 <option value='iPhone 12 Pro'>iPhone 12 Pro</option>
@@ -116,6 +117,7 @@ function Interests() {
             <FormControl>
               <FormLabel htmlFor='startedProcess'>Started Process</FormLabel>
               <Select name='startedProcess' ref={register}>
+                <option>All</option>
                 <option value='true'>Yes</option>
                 <option value='false'>No</option>
               </Select>
@@ -181,6 +183,6 @@ function Interests() {
   );
 }
 
-export default withUrqlClient(() => ({
+export default withUrqlClient(ssrExchange => ({
   url: 'http://localhost:5051/graphql'
 }))(Interests);
