@@ -12,7 +12,7 @@ import {
   useToast
 } from '@chakra-ui/core';
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'urql';
+import { useMutation, gql } from '@apollo/client';
 import Layout from '../components/Layout';
 import SwitchPage from '../components/SwitchPage';
 
@@ -23,7 +23,7 @@ type Inputs = {
   startedProcess: boolean;
 };
 
-const CreatePollEntry = `
+const CreatePollEntry = gql`
   mutation($input: iPhonePollInput!) {
     createPollEntry(input: $input) {
       id
@@ -36,8 +36,11 @@ const CreatePollEntry = `
 `;
 
 export default function Home() {
-  const [_, createPollEntry] = useMutation(CreatePollEntry);
   const { register, handleSubmit, errors } = useForm<Inputs>();
+  const [createPollEntry] = useMutation(CreatePollEntry, {
+    onCompleted: poll => poll,
+    onError: () => 'error'
+  });
   const toast = useToast();
 
   const submitInterest = async (
@@ -61,27 +64,27 @@ export default function Home() {
       startedProcess: newStartedProcess
     };
 
-    await createPollEntry({ input: variables }).then(result => {
-      if (result.error) {
-        toast({
-          position: 'bottom',
-          render: () => (
-            <Box m={3} color='white' p={3} bg='gray.500'>
-              There was an error
-            </Box>
-          )
-        });
-      } else {
-        toast({
-          position: 'bottom',
-          render: () => (
-            <Box m={3} color='white' p={3} bg='pink.500'>
-              Upgrade interest successfully submitted
-            </Box>
-          )
-        });
-      }
-    });
+    const createdPoll = await createPollEntry({ variables });
+
+    if (createdPoll !== 'error') {
+      toast({
+        position: 'bottom',
+        render: () => (
+          <Box m={3} color='white' p={3} bg='gray.500'>
+            There was an error
+          </Box>
+        )
+      });
+    } else {
+      toast({
+        position: 'bottom',
+        render: () => (
+          <Box m={3} color='white' p={3} bg='pink.500'>
+            Upgrade interest successfully submitted
+          </Box>
+        )
+      });
+    }
   };
 
   return (
