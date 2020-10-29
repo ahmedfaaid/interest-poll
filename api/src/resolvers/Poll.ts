@@ -52,18 +52,22 @@ export class PollResolver {
       return dateResults;
     } else if (!date && filter) {
       // if only a filter is provided
-      return await pollRepo.find({
+      const results = await pollRepo.find({
         where: filter,
         order: { createdAt: 'DESC' },
         take,
         skip
       });
+
+      return results;
     } else {
-      return await pollRepo.find({
+      const results = await pollRepo.find({
         order: { createdAt: 'DESC' },
         take,
         skip
       });
+
+      return results;
     }
   }
 
