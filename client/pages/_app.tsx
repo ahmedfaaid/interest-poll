@@ -1,34 +1,25 @@
 import { AppProps } from 'next/app';
 import { ThemeProvider, CSSReset } from '@chakra-ui/core';
-import { createClient, Provider } from 'urql';
-import { cacheExchange } from '@urql/exchange-graphcache';
-import { simplePagination } from '@urql/exchange-graphcache/extras';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { customTheme } from '../styles/theme';
 
 // imports for date picker styles
 import '../styles/date-picker.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const client = createClient({
-  url: 'http://localhost:5051/graphql',
-  exchanges: [
-    cacheExchange({
-      resolvers: {
-        Query: {
-          iphonePolls: simplePagination()
-        }
-      }
-    })
-  ]
+const client = new ApolloClient({
+  uri: 'http://localhost:5051/graphql',
+  cache: new InMemoryCache(),
+  ssrMode: typeof window === 'undefined'
 });
 
 function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={customTheme}>
-      <Provider value={client}>
+      <ApolloProvider client={client}>
         <CSSReset />
         <Component {...pageProps} />
-      </Provider>
+      </ApolloProvider>
     </ThemeProvider>
   );
 }

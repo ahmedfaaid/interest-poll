@@ -13,10 +13,9 @@ import {
   StatLabel,
   StatNumber
 } from '@chakra-ui/core';
-import { withUrqlClient } from 'next-urql';
 import { useState } from 'react';
-import { useQuery } from 'urql';
 import { useForm } from 'react-hook-form';
+import { useQuery, gql } from '@apollo/client';
 import Categories from '../components/Categories';
 import DataItem from '../components/DataItem';
 import Layout from '../components/Layout';
@@ -29,7 +28,32 @@ type Inputs = {
   date: Date;
 };
 
-const InterestPolls = `
+type PollFilter = {
+  model: string | null;
+  startedProcess: boolean | null;
+};
+
+interface InterestPoll {
+  id: number;
+  BAN: number;
+  model: string;
+  quantity: number;
+  startedProcess: boolean;
+  createdAt: Date;
+}
+
+interface InterestPollData {
+  iphonePolls: InterestPoll[];
+}
+
+interface InterestPollVars {
+  limit: number;
+  skip?: number;
+  filter?: PollFilter;
+  date?: Date;
+}
+
+const InterestPolls = gql`
   query($limit: Int!, $skip: Int, $filter: iPhonePollFilter, $date: DateTime) {
     iphonePolls(limit: $limit, skip: $skip, filter: $filter, date: $date) {
       id
@@ -42,23 +66,22 @@ const InterestPolls = `
   }
 `;
 
-function Interests() {
+export default function Interests() {
   const [variables, setVariables] = useState({
     limit: 15,
     skip: 0
   });
   const [startDate, setStartDate] = useState(new Date());
-  const [result, reexecuteQuery] = useQuery({
-    query: InterestPolls,
-    variables
-  });
   const { register, handleSubmit } = useForm<Inputs>();
+  const { loading, error, data } = useQuery<InterestPollData, InterestPollVars>(
+    InterestPolls,
+    {
+      variables
+    }
+  );
 
-  const { data, fetching, error } = result;
-
-  const refetch = () => {
-    reexecuteQuery({ requestPolicy: 'network-only' });
-    setVariables(prev => ({ ...prev, skip: 0 }));
+  const resetAndFetch = () => {
+    setVariables({ limit: 15, skip: 0 });
   };
 
   const loadMore = () => {
@@ -67,21 +90,35 @@ function Interests() {
 
   const filterResults = ({ model, startedProcess }) => {
     let newStartedProcess;
+    let filterModel;
 
     if (startedProcess === 'true') {
       newStartedProcess = true;
     } else if (startedProcess === 'false') {
       newStartedProcess = false;
+    } else if (startedProcess === 'all') {
+      newStartedProcess = null;
+    }
+
+    if (model === 'all') {
+      filterModel = null;
+    } else {
+      filterModel = model;
     }
 
     setVariables(prev => ({
       ...prev,
-      filter: { model, startedProcess: newStartedProcess },
+      filter: {
+        ...(filterModel && { model: filterModel }),
+        ...(newStartedProcess === true || newStartedProcess === false
+          ? { startedProcess: newStartedProcess }
+          : {})
+      },
       date: startDate
     }));
   };
 
-  if (fetching) {
+  if (loading) {
     return (
       <Layout>
         <Spinner color='pink.500' />
@@ -106,8 +143,8 @@ function Interests() {
           <Stack spacing={8} mt={8}>
             <FormControl>
               <FormLabel htmlFor='model'>Model</FormLabel>
-              <Select name='model' ref={register}>
-                <option>All</option>
+              <Select name='model' ref={register} defaultValue='all'>
+                <option value='all'>All</option>
                 <option value='iPhone 12'>iPhone 12</option>
                 <option value='iPhone 12 Mini'>iPhone 12 Mini</option>
                 <option value='iPhone 12 Pro'>iPhone 12 Pro</option>
@@ -116,8 +153,8 @@ function Interests() {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor='startedProcess'>Started Process</FormLabel>
-              <Select name='startedProcess' ref={register}>
-                <option>All</option>
+              <Select name='startedProcess' ref={register} defaultValue='all'>
+                <option value='all'>All</option>
                 <option value='true'>Yes</option>
                 <option value='false'>No</option>
               </Select>
@@ -139,7 +176,7 @@ function Interests() {
           icon='repeat'
           size='lg'
           aria-label='Refetch Interest Polls'
-          onClick={refetch}
+          onClick={resetAndFetch}
         />
         <StatGroup d='flex' w='40%' justifyContent='center' my={8}>
           <Stat bg='pink.500' borderRadius='md' p={4} color='white' mx={4}>
@@ -174,7 +211,7 @@ function Interests() {
           bg='pink.500'
           color='white'
           onClick={loadMore}
-          isDisabled={data.iphonePolls.length < variables.limit || fetching}
+          isDisabled={data.iphonePolls.length < variables.limit || loading}
         >
           Load More
         </Button>
@@ -182,7 +219,3 @@ function Interests() {
     </Layout>
   );
 }
-
-export default withUrqlClient(ssrExchange => ({
-  url: 'http://localhost:5051/graphql'
-}))(Interests);
