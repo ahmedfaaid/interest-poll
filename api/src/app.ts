@@ -12,7 +12,15 @@ const main = async () => {
 
   app.use(cors());
 
-  const conn = await createConnection();
+  const conn = await createConnection(
+    process.env.NODE_ENV === 'production'
+      ? {
+          type: 'postgres',
+          url: process.env.DATABASE_URL,
+          entities: ['src/entities/*.ts']
+        }
+      : null
+  );
 
   // await conn.runMigrations();
 
@@ -21,7 +29,8 @@ const main = async () => {
       resolvers: [PollResolver],
       emitSchemaFile: path.resolve(__dirname, 'schema.gql'),
       validate: false
-    })
+    }),
+    playground: true
   });
 
   apolloServer.applyMiddleware({ app });
