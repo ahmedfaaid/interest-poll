@@ -4,7 +4,8 @@
   "description": "API for the interest polling application",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/app.js",
+    "build": "rm -rf ./build && npx tsc",
     "dev": "nodemon",
     "start:db": "docker-compose up -d"
   },
