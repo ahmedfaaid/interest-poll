@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "API for the interest polling application",
   "main": "app.js",
-  "type": "module",
   "scripts": {
     "start": "node dist/app.js",
     "build": "rm -rf ./dist && npx tsc",
