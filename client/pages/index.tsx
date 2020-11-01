@@ -39,7 +39,7 @@ export default function Home() {
   const { register, handleSubmit, errors } = useForm<Inputs>();
   const [createPollEntry] = useMutation(CreatePollEntry, {
     onCompleted: poll => poll,
-    onError: () => 'error'
+    onError: err => err
   });
   const toast = useToast();
 
@@ -47,8 +47,6 @@ export default function Home() {
     { BAN, model, quantity, startedProcess },
     e
   ) => {
-    e.target.reset();
-
     let newStartedProcess;
 
     if (startedProcess === 'true') {
@@ -64,9 +62,11 @@ export default function Home() {
       startedProcess: newStartedProcess
     };
 
-    const createdPoll = await createPollEntry({ variables });
+    const createdPoll = await createPollEntry({
+      variables: { input: variables }
+    });
 
-    if (createdPoll !== 'error') {
+    if (!createdPoll) {
       toast({
         position: 'bottom',
         render: () => (
@@ -76,6 +76,7 @@ export default function Home() {
         )
       });
     } else {
+      e.target.reset();
       toast({
         position: 'bottom',
         render: () => (
