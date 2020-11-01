@@ -17,7 +17,7 @@ const main = async () => {
       ? {
           type: 'postgres',
           url: process.env.DATABASE_URL,
-          entities: ['entities/*.ts']
+          entities: ['dist/entities/*.js']
         }
       : null
   );
