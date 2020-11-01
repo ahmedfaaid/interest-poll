@@ -4,7 +4,7 @@
   "description": "API for the interest polling application",
   "main": "app.js",
   "scripts": {
-    "start": "npx tsc && node dist/app.js",
+    "start": "node dist/app.js",
     "build": "rm -rf ./dist && npx tsc",
     "dev": "nodemon",
     "start:db": "docker-compose up -d"
