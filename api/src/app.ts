@@ -17,8 +17,8 @@ const main = async () => {
       ? {
           type: 'postgres',
           url: process.env.DATABASE_URL,
-          entities: ['dist/entities/*.js'],
-          synchronize: true
+          entities: ['dist/entities/*.js']
+          // synchronize: true
         }
       : null
   );
