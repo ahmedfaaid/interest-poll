@@ -8,7 +8,10 @@ import '../styles/date-picker.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5051/graphql',
+  uri:
+    process.env.NODE_ENV === 'production'
+      ? process.env.API_URL
+      : 'http://localhost:5051/graphql',
   cache: new InMemoryCache(),
   ssrMode: typeof window === 'undefined'
 });
