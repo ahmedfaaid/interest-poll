@@ -30,7 +30,8 @@ const main = async () => {
       emitSchemaFile: path.resolve(__dirname, 'schema.gql'),
       validate: false
     }),
-    playground: true
+    playground: true,
+    introspection: true
   });
 
   apolloServer.applyMiddleware({ app });
