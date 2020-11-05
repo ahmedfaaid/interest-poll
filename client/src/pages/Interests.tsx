@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Box,
   Button,
@@ -21,7 +22,6 @@ import DataItem from '../components/DataItem';
 import Layout from '../components/Layout';
 import SwitchPage from '../components/SwitchPage';
 import MyDatePicker from '../components/MyDatePicker';
-import { initializeApollo } from '../apolloClient';
 
 type Inputs = {
   model: string;
@@ -89,9 +89,15 @@ export default function Interests() {
     setVariables(prev => ({ ...prev, skip: prev.skip + prev.limit }));
   };
 
-  const filterResults = ({ model, startedProcess }) => {
-    let newStartedProcess;
-    let filterModel;
+  const filterResults = ({
+    model,
+    startedProcess
+  }: {
+    model: string;
+    startedProcess: string;
+  }) => {
+    let newStartedProcess: boolean | null;
+    let filterModel: string | null;
 
     if (startedProcess === 'true') {
       newStartedProcess = true;
@@ -183,19 +189,19 @@ export default function Interests() {
           <Stat bg='pink.500' borderRadius='md' p={4} color='white' mx={4}>
             <StatLabel>Total Devices</StatLabel>
             <StatNumber>
-              {data.iphonePolls.reduce((acc, curr) => {
+              {data!.iphonePolls.reduce((acc, curr) => {
                 return acc + curr.quantity;
               }, 0)}
             </StatNumber>
           </Stat>
           <Stat bg='pink.500' borderRadius='md' p={4} color='white' mx={4}>
             <StatLabel>Total Accounts</StatLabel>
-            <StatNumber>{data.iphonePolls.length}</StatNumber>
+            <StatNumber>{data!.iphonePolls.length}</StatNumber>
           </Stat>
         </StatGroup>
         <Categories />
         <List as='ol'>
-          {data.iphonePolls.map(
+          {data!.iphonePolls.map(
             ({ id, BAN, model, quantity, startedProcess, createdAt }) => (
               <DataItem
                 key={id}
@@ -212,25 +218,11 @@ export default function Interests() {
           bg='pink.500'
           color='white'
           onClick={loadMore}
-          isDisabled={data.iphonePolls.length < variables.limit || loading}
+          isDisabled={data!.iphonePolls.length < variables.limit || loading}
         >
           Load More
         </Button>
       </Stack>
     </Layout>
   );
-}
-
-export async function getServerSideProps() {
-  const apolloClient = initializeApollo();
-
-  await apolloClient.query({
-    query: InterestPolls
-  });
-
-  return {
-    props: {
-      initialApolloState: apolloClient.cache.extract()
-    }
-  };
 }

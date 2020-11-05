@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, Divider, Flex } from '@chakra-ui/core';
 
 export default function Categories() {

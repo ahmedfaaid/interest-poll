@@ -1,5 +1,5 @@
+import React, { ReactNode } from 'react';
 import { Box, Heading } from '@chakra-ui/core';
-import { ReactNode } from 'react';
 
 interface LayoutProps {
   children: ReactNode;

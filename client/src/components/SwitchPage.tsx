@@ -1,5 +1,6 @@
+import React from 'react';
 import { Box, Icon, Text } from '@chakra-ui/core';
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 
 interface SwitchPageProps {
   text: string;
@@ -7,15 +8,13 @@ interface SwitchPageProps {
   direction: string;
 }
 
-export default function SwitchPage({ text, page, direction }) {
+export default function SwitchPage({ text, page, direction }: SwitchPageProps) {
   let link;
 
   if (direction === 'right') {
     link = (
       <>
-        <Link href={page}>
-          <a>{text}</a>
-        </Link>
+        <Link to={page}>{text}</Link>
         <Icon name='arrow-forward' ml={1} />
       </>
     );
@@ -23,9 +22,7 @@ export default function SwitchPage({ text, page, direction }) {
     link = (
       <>
         <Icon name='arrow-back' mr={1} />
-        <Link href={page}>
-          <a>{text}</a>
-        </Link>
+        <Link to={page}>{text}</Link>
       </>
     );
   }

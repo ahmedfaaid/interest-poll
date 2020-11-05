@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, Divider, Flex, ListItem } from '@chakra-ui/core';
 
 interface DataItemProps {

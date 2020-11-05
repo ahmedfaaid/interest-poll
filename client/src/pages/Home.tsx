@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Box,
   Button,
@@ -11,7 +12,7 @@ import {
   Stack,
   useToast
 } from '@chakra-ui/core';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { useMutation, gql } from '@apollo/client';
 import Layout from '../components/Layout';
 import SwitchPage from '../components/SwitchPage';
@@ -19,8 +20,8 @@ import SwitchPage from '../components/SwitchPage';
 type Inputs = {
   BAN: string;
   model: string;
-  quantity: number;
-  startedProcess: boolean;
+  quantity: string;
+  startedProcess: string;
 };
 
 const CreatePollEntry = gql`
@@ -43,7 +44,7 @@ export default function Home() {
   });
   const toast = useToast();
 
-  const submitInterest = async (
+  const submitInterest: SubmitHandler<Inputs> = async (
     { BAN, model, quantity, startedProcess },
     e
   ) => {
@@ -76,7 +77,7 @@ export default function Home() {
         )
       });
     } else {
-      e.target.reset();
+      e!.target.reset();
       toast({
         position: 'bottom',
         render: () => (
