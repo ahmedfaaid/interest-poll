@@ -21,6 +21,7 @@ import DataItem from '../components/DataItem';
 import Layout from '../components/Layout';
 import SwitchPage from '../components/SwitchPage';
 import MyDatePicker from '../components/MyDatePicker';
+import { initializeApollo } from '../apolloClient';
 
 type Inputs = {
   model: string;
@@ -218,4 +219,18 @@ export default function Interests() {
       </Stack>
     </Layout>
   );
+}
+
+export async function getServerSideProps() {
+  const apolloClient = initializeApollo();
+
+  await apolloClient.query({
+    query: InterestPolls
+  });
+
+  return {
+    props: {
+      initialApolloState: apolloClient.cache.extract()
+    }
+  };
 }

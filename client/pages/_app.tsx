@@ -1,22 +1,16 @@
 import { AppProps } from 'next/app';
 import { ThemeProvider, CSSReset } from '@chakra-ui/core';
-import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
+import { useApollo } from '../apolloClient';
 import { customTheme } from '../styles/theme';
 
 // imports for date picker styles
 import '../styles/date-picker.css';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const client = new ApolloClient({
-  uri:
-    process.env.NODE_ENV === 'production'
-      ? process.env.API_URL
-      : 'http://localhost:5051/graphql',
-  cache: new InMemoryCache(),
-  ssrMode: typeof window === 'undefined'
-});
-
 function App({ Component, pageProps }: AppProps) {
+  const client = useApollo(pageProps.initialApolloState);
+
   return (
     <ThemeProvider theme={customTheme}>
       <ApolloProvider client={client}>
